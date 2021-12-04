@@ -1,5 +1,12 @@
 var myPage = document.querySelector('h1');
+const WilDE = 'Willkommen';
+const WelEN = 'Welcome';
 
 myPage.onclick = function() {
-    myPage.textContent = 'Welcome';
+    if (myPage.textContent === WilDE) {
+        myPage.textContent = WelEN;
+    } else {
+        myPage.textContent = WilDE;
+    }
+
 }
