@@ -23,3 +23,5 @@ MyButton.onclick = function() {
     var AktuellesDatum = Date();
     myP.textContent = AktuellesDatum;
 }
+
+alert("Hello World");
