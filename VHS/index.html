@@ -18,14 +18,16 @@
 <body>
     <h1>Willkommen, bitte geben Sie ihre Anmeldedaten ein</h1>
     <form action="./logedin.html" autocomplete="off">
-        <label for="fname">E-Mail Adresse:</label>
+        <label for="fname" class="abstand" title="Bitte eine beliebige E-Mail Adresse eingeben">E-Mail Adresse:*</label>
         <input type="text" id="fname" name="fname" pattern="[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-zA-Z]{2,4}" title="Invalid email address" /><br /><br />
-        <label for="passwd">Passwort:_____</label>
+        <label for="passwd" class="abstand" title="Bitte ein beliebiges Passwort eingeben: Mind. 8 Zeichen">Passwort:*</label>
         <input type="password" id="passwd" name="passwd" pattern=".{8,}" title="Bitte mehr als 8 Zeichen eingeben" /><br /><br />
         <input type="submit" value="Absenden" />
     </form>
     </br>
-    <a>*Die Eingaben dienen nur zu Demonstrationszwecken und werden weder gespeichert noch geprüft </a>
+    <hr>
+    <a class="notes">*Die Eingaben dienen nur zu Demonstrationszwecken und werden nicht gespeichert </a><br>
+    <a class="notes">*Bitte keine Echtdaten eingeben </a>
 </body>
 
 </html>
