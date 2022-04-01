@@ -3,10 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
-    <meta http-equiv="X-WebKit-CSP" content="default-src 'self'; script-src 'self'" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta charset="UTF-8" />
+    <meta charset="ISO-8859-1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
     <script src="./scripts/main.js"></script>
@@ -19,7 +16,7 @@
     <h1>Willkommen, bitte geben Sie ihre Anmeldedaten ein</h1>
     <form action="./logedin.html" autocomplete="off">
         <label for="fname" class="abstand" title="Bitte eine beliebige E-Mail Adresse eingeben">E-Mail Adresse:*</label>
-        <input type="text" id="fname" name="fname" pattern="[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-zA-Z]{2,4}" title="Invalid email address" /><br /><br />
+        <input type="text" id="fname" name="fname" pattern="[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-zA-Z]{2,4}" title="Ungültige E-Mail Adresse" /><br /><br />
         <label for="passwd" class="abstand" title="Bitte ein beliebiges Passwort eingeben: Mind. 8 Zeichen">Passwort:*</label>
         <input type="password" id="passwd" name="passwd" pattern=".{8,}" title="Bitte mehr als 8 Zeichen eingeben" /><br /><br />
         <input type="submit" value="Absenden" />
