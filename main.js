@@ -1,5 +1,4 @@
 var myPage = document.querySelector('h1');
-var iframe = document.querySelector('#marketing');
 
 myPage.onclick = function() {
     let WilDE = 'Willkommen';
@@ -25,4 +24,14 @@ MyButton.onclick = function() {
     myP.textContent = AktuellesDatum;
 }
 
+<button onclick="myFunction()">Try it</button>
+
+<script>
+function myFunction() {
+  document.open();
+  document.write("<h1>Hello World</h1>");
+  document.close();
+}
+
+</script>
 alert("Hello World");
