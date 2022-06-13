@@ -29,6 +29,7 @@ function myFunction() {
   document.open();
   document.write("<h1>Hello World</h1>");
   document.close();
+  alert("Hello World");
 }
 
-alert("Hello World");
+
