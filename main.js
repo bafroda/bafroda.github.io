@@ -4,6 +4,7 @@ $("iframe[name='result']").each(function() {
 });
 
 var myPage = document.querySelector('h1');
+var iframe = document.querySelector('#marketing');
 
 myPage.onclick = function() {
     let WilDE = 'Willkommen';
