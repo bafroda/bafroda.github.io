@@ -27,6 +27,7 @@ MyButton.onclick = function() {
     var myP = document.querySelector('p');
     var AktuellesDatum = Date();
     myP.textContent = AktuellesDatum;
+    alert("Wie gehts?");
 }
 
 alert("Hello World");
