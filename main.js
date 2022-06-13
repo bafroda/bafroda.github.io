@@ -1,8 +1,3 @@
-this.$ = this.jQuery = jQuery.noConflict(true);
-$("iframe[name='result']").each(function() {
-    this.sandbox += ' allow-modals';
-});
-
 var myPage = document.querySelector('h1');
 
 myPage.onclick = function() {
@@ -27,7 +22,6 @@ MyButton.onclick = function() {
     var myP = document.querySelector('p');
     var AktuellesDatum = Date();
     myP.textContent = AktuellesDatum;
-    alert("Wie gehts?");
 }
 
 alert("Hello World");
