@@ -1,0 +1,50 @@
+#test {
+    color: gray;
+  }
+  
+  #diceVal {
+    font-size: 50px;
+    margin-left: 10px;
+  
+  }
+  
+  #but {
+     font-size: 30px;
+     margin-bottom: 20px;
+  }
+  
+  img {
+     margin-left: 50px;
+     width: 70px;
+     hight: 70px;
+  }
+  
+  .green {
+     background-color: green;
+  }
+  
+  .beige {
+     background-color: beige;
+  }
+
+  #comm {
+     font-weight: bold;
+     font-size: 20px;
+     width: 300px;
+  }
+
+  table, #comm, #but, p {
+    margin-left: 10px
+  }
+  
+  td {
+     font-size: 20px;
+     font-weight: bold;
+  }
+
+  #all {
+    width: 400px;
+    margin: 0 auto;
+    background-color: darkgray;
+  }
+
