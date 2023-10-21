@@ -16,7 +16,7 @@
   img {
      margin-left: 50px;
      width: 70px;
-     hight: 70px;
+     height: 80px;
   }
   
   .green {
@@ -36,15 +36,14 @@
   table, #comm, #but, p {
     margin-left: 10px
   }
-  
+
   td {
      font-size: 20px;
      font-weight: bold;
   }
 
   #all {
-    width: 400px;
+    width: 460px;
     margin: 0 auto;
     background-color: darkgray;
   }
-
