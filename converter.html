@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline';
+           script-src 'unsafe-inline'; img-src https://*; child-src 'none';" />
+    <title>URL Decoder/Encoder</title>
+    <style type="text/css">
+        body {
+            background: rgb(240, 229, 168);
+            color: black;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        h1 {
+            font-family: Arial, sans-serif;
+            line-height: 0.85em;
+            border-bottom: 2px solid;
+            margin-bottom: 0.33em;
+            padding-bottom: 0;
+        }
+
+        textarea {
+            background: #EEF;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        table,
+        th,
+        td {
+            margin-top: 10px;
+            border-collapse: collapse;
+            border: 1px solid black;
+        }
+        img {
+            width: 10px;
+        }
+    </style>
+    <script>
+        //URL decode vvs.
+        function encode() {
+            let obj = document.getElementById('dencoder');
+            let unencoded = obj.value;
+            obj.value = encodeURIComponent(unencoded).replace(/'/g, "%27").replace(/"/g, "%22");
+        }
+        function decode() {
+            let obj = document.getElementById('dencoder');
+            let encoded = obj.value;
+            obj.value = decodeURIComponent(encoded.replace(/\+/g, " "));
+        }
+        //Hex-Dezimal vvs.
+        hex = "0123456789ABCDEF";
+        function rechne(was) {
+            var inp;
+            var out;
+            if (was == "hex") {
+                inp = document.hex_dez.hex.value;
+                out = parseInt(inp, 16);
+                if (isNaN(out)) {
+                    alert("fehlerhafter Eingabewert");
+                    out = "";
+                }
+                document.hex_dez.dec.value = out;
+            } else {
+                inp = parseInt(document.hex_dez.dec.value);
+                out = "";
+                if (isNaN(inp)) {
+                    alert("fehlerhafter Eingabewert");
+                } else {
+                    while (inp != 0) {
+                        out = hex.charAt(inp % 16) + out;
+                        inp = inp >> 4;
+                    }
+                }
+                document.hex_dez.hex.value = out;
+            }
+        }
+        //Base64-Text vvs.
+        function base(wat) {
+            var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9\+\/\=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/\r\n/g, "\n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
+            var inp;
+            var out;
+            if (wat == "base64") {
+                inp = document.form64.base64.value;
+                DerTyp = typeof (inp);
+                out = Base64.decode(inp);
+                document.form64.text.value = out;
+            } else {
+                inp = document.form64.text.value;
+                DerTyp = typeof (inp);
+                out = Base64.encode(inp);
+                document.form64.base64.value = out;
+            }
+        }
+        //Safe-Url decode
+        function safe() {
+            let link = document.safeURL.safeURL.value; //input-name=safeURL
+            let target_url = "Error: couldn't find target URL.";
+            let url_parts = '';
+            let params = '';
+            if (link) {
+                if (link.includes("?")) { url_parts = link.split("?")[1]; }
+                else { decode_url = "Error: couldn't decode URL." }
+                if (url_parts.includes("&")) { params = url_parts.split("&"); }
+                else { decode_url = "Error: couldn't decode URL." }
+                for (x = 0; x < params.length; x++) {
+                    namval = params[x].split("=");
+                    if (namval[0] == "url") target_url = namval[1];
+                }
+                decode_url = decodeURIComponent(target_url);
+                document.safeURL.URLdecoded.value = decode_url;
+            } else {
+                alert(target_url);
+            }
+        }
+        //Spielereien
+        text = 'Willkommen %1 auf unserer Homepage!';
+
+        function NameMerken() {
+            a = prompt('Hallo Besucher. Bitte geben Sie Ihren Namen ein.');
+            //Schreiben('username', a, 1000 * 60 * 60 * 24 * 365);
+            NameHolen();
+        }
+
+        function NameHolen() {
+            if (document.cookie) {
+                username = Lesen('username');
+                if (username != '') {
+                    b = text.replace('%1', username);
+                    document.writeln(b);
+                }
+            }
+            else { }
+        }
+        //Text nach Unicode vvs. noch nicht fertig
+        function uniCode(wat) {
+            let out = ""
+            if (wat == "uniText") {
+                inp = document.unicode.uni.value;
+                for (i = 0; i < inp.length; i++) {
+                    out += "&#" + inp.charCodeAt(i) + ";";
+                }
+                document.getElementById("uniArea").value = out;
+            } else {
+                inp = document.unicode.text.value.replace(" ", ""); //Leerzeichen entfernen
+                let spl = inp.split(";");
+                for (el of spl) {
+                    let numb = el.substring(2);
+                    let lt = String.fromCharCode(numb);
+                    out += lt;
+                }
+                document.getElementById("uniArea").value = out;
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <input type="button" value="Namen holen" onClick="NameMerken();">
+    <button onclick="alert('Oje')">click</button>
+    <p onclick="alert()">&spades;</p>
+    
+
+    <form name="url_enc_dec"> <!--URL decode vvs.-->
+        <h1>URL Decoder/Encoder</h1>
+        <textarea id="dencoder" cols="100" rows="10"></textarea>
+        <div>
+            <button type="button" onclick="decode()">Decode</button>
+            <button type="button" onclick="encode()">Encode</button>
+        </div>
+    </form>
+
+    <form name="hex_dez"> <!--Hex nach Dezimal vvs.-->
+        <h1>Hex - Dez Convert</h1>
+        <label>Hex: <input id="hex" type="text" name="hex" size="50" value="F"></label>
+        <button type="button" onClick="rechne('hex');">=> Dec</button>
+        <br>
+        <label>Dec: <input id="dec" type="text" name="dec" size="50" value="15"></label>
+        <button type="button" onClick="rechne('dec');">=> Hex</button>
+    </form>
+
+    <form name="form64"> <!--Base64 nach Text vvs.-->
+        <h1>Base64 Convert</h1>
+        <label>Base64:<input id="base64" type="text" name="base64" size="90" value="VGV4dA=="></label>
+        <button type="button" onClick="base('base64');">=> Text</button><br>
+        <label>Text:__<input id="text" type="text" name="text" size="90" value="Text"></label>
+        <button type="button" onClick="base('text');">=> Base64</button>
+    </form>
+
+    <form name="safeURL"> <!--Decode MS SafeLinks-->
+        <h1>Decode SafeURL</h1>
+        <label>SafeURL:<input id="safeURLlink" type="text" name="safeURLX" size="150" value=""></label>
+        <button type="button" onClick="safe();">=> Decode</button><br>
+        <label>URL dec.:<input id="URLdecoded" type="text" name="text" size="150" value=""></label>
+    </form>
+
+    <form name="unicode"> <!--Text nach Unicode vvs.-->
+        <h1>unicode Zeichen</h1>
+        <label>Text:____<input id="uni" type="text" name="uni" size="90" value="Hallo"></label>
+        <button type="button" onClick="uniCode('uniText');">=> UniCode</button><br>
+        <label>UniCode:<input id="uniChar" type="text" name="text" size="90" value=""></label>
+        <button type="button" onClick="uniCode('uniChar');">=> Text</button><br>
+        <textarea id="uniArea" cols="100" rows="5"></textarea>
+    </form>
+
+
+    <h1>XML Notation</h1>
+    <table class="wikitable">
+        <tbody>
+            <tr>
+                <th> Zeichen </th>
+                <th>Notation in XML </th>
+                <th>Bemerkung
+                </th>
+            </tr>
+            <tr>
+                <td>&lt; </td>
+                <td> &amp;lt; </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td>&gt; </td>
+                <td> &amp;gt; </td>
+                <td> nur problematisch in Tags und bei ']]&gt;'
+                </td>
+            </tr>
+            <tr>
+                <td>&amp; </td>
+                <td> &amp;amp; </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td>" </td>
+                <td> &amp;quot; </td>
+                <td> nur problematisch in Attributwerten mit "â¦"
+                </td>
+            </tr>
+            <tr>
+                <td>' </td>
+                <td> &amp;apos; </td>
+                <td> nur problematisch in Attributwerten mit 'â¦'
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>
