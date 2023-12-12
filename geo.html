@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo Infos aus Browser</title>
+</head>
+
+<body>
+    <script>
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+        }
+
+        function showPosition(position) {
+            let lat = "N", lon = "E";
+            if ( position.coords.latitude < 0 ) {
+                lat = "S";
+            }
+            if ( position.coords.longitude < 0 ) {
+                lon = "W";
+            }
+            document.write(lat + position.coords.latitude +
+                ", " + lon + position.coords.longitude);
+        }
+    </script>
+</body>
+
+</html>
