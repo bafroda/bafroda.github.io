@@ -31,6 +31,25 @@
 		outline: 1px solid #005290;
 	}
 </style>
+<script>
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+        }
+
+        function showPosition(position) {
+            let lat = "N", lon = "E";
+            if ( position.coords.latitude < 0 ) {
+                lat = "S";
+            }
+            if ( position.coords.longitude < 0 ) {
+                lon = "W";
+            }
+            document.write(lat + position.coords.latitude +
+                ", " + lon + position.coords.longitude);
+        }
+</script>
 
 <script type='text/javascript' src='https://service.force.com/embeddedservice/5.0/esw.min.js'></script>
 <script type='text/javascript'>
