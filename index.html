@@ -31,6 +31,7 @@
 		outline: 1px solid #005290;
 	}
 </style>
+<p id="geo"></p>	
 <script>
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
@@ -46,8 +47,7 @@
             if ( position.coords.longitude < 0 ) {
                 lon = "W";
             }
-            document.write(lat + position.coords.latitude +
-                ", " + lon + position.coords.longitude);
+	    document.getElementById("geo").innerHTML = lat + position.coords.latitude + ", " + lon + position.coords.longitude;
         }
 </script>
 
