@@ -22,6 +22,10 @@ MyButton.onclick = function() {
     var myP = document.querySelector('p');
     var AktuellesDatum = Date();
     myP.textContent = AktuellesDatum;
+    user = document.getElementsByClassName('input')[0].value;
+    pw = document.getElementsByClassName('input')[1].value;
+    console.log(user);
+    console.log(pw);
 }
 
 
