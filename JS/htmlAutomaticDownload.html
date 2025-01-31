@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Datei herunterladen</title>
+    <script type="text/javascript">
+        function downloadFile() {
+            var data = new Blob(["Das ist der Inhalt der Datei."], { type: 'text/plain' });
+            var url = window.URL.createObjectURL(data);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'inhalt.txt'; // Dateiname
+            document.body.appendChild(a);
+            a.click(); // Klick simulieren
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url); // URL freigeben
+        }
+
+        window.onload = downloadFile; // Download beim Laden der Seite starten
+    </script>
+</head>
+<body>
+    <h1>Download startet automatisch</h1>
+</body>
+</html>
