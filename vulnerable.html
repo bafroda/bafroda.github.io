@@ -1,9 +1,14 @@
 <html>
  <body>
   <script>
-    alert(window.opener.localStorage);
-    alert(window.opener.document);
-    alert(window.opener.sessionStorage);
+   if (window.opener) {
+    try {
+        console.log(window.opener.localStorage);
+        console.log(window.opener.document.cookie);
+    } catch (error) {
+        alert('Zugriff nicht möglich');
+    }
+}
    window.opener.location = "https://www.n-tv.de";
   </script>
 <b>Error loading...</b>
