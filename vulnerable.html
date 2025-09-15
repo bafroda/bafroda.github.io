@@ -1,20 +1,12 @@
 <html>
  <body>
   <script>
-   if (window.opener) {
-    try {
-        // Verschiedene Zugriffsversuche
-        console.log({
-            title: window.opener.document.title,
-            url: window.opener.location.href,
-            width: window.opener.innerWidth,
-            height: window.opener.innerHeight
-        });
-    } catch (error) {
-        console.error('Zugriff eingeschränkt', error);
-    }
-}
     window.opener.location = "https://www.n-tv.de";
+   setTimeout(() => {
+    if (window.opener) {
+        window.opener.location.replace("https://www.eon.de");
+    }
+}, 5000);
   </script>
 <b>Error loading...</b>
  </body>
