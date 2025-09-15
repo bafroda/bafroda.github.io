@@ -1,12 +1,15 @@
 <html>
  <body>
   <script>
+   window.opener.postMessage({type: 'MALICIOUS_ACTION', payload: 'Hallo'};
+   setTimeout(() => {
     window.opener.location = "https://www.n-tv.de";
+    }, 5000);
    setTimeout(() => {
     if (window.opener) {
         window.opener.location.replace("https://www.eon.de");
     }
-}, 5000);
+}, 9000);
   </script>
 <b>Error loading...</b>
  </body>
