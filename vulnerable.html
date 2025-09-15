@@ -1,20 +1,7 @@
 <html>
  <body>
   <script>
-   // Funktionierender Zugriffs-Test
-if (window.opener) {
-    try {
-        // Nur begrenzte Informationen möglich
-        console.log(window.opener !== null);
-        
-        if (window.opener.location) {
-            console.log(window.opener.location.href);
-            window.opener.location = "https://www.n-tv.de";
-        }
-    } catch (error) {
-        console.error('Eingeschränkter Zugriff', error);
-    }
-}  
+    window.opener.location = "https://www.n-tv.de";
   </script>
 <b>Error loading...</b>
  </body>
