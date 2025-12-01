@@ -179,28 +179,70 @@
         </div>
     </form>
 
-    <form name="hex_dez"> <!--Hex nach Dezimal vvs.-->
+    <!--Hex nach Dezimal vvs.-->
+    <!-- <form name="hex_dez"> 
         <h1>Hex - Dez Convert</h1>
         <label>Hex: <input id="hex" type="text" name="hex" size="50" value="F"></label>
         <button type="button" onClick="rechne('hex');">=> Dec</button>
         <br>
         <label>Dec: <input id="dec" type="text" name="dec" size="50" value="15"></label>
         <button type="button" onClick="rechne('dec');">=> Hex</button>
+    </form> -->
+
+    <!--Hex nach Dezimal vvs.-->
+    <form name="hex_dez"> 
+        <h1>Hex - Dez Convert</h1>
+        <label>Hex: 
+            <textarea id="hex" name="hex" rows="3" cols="50">F</textarea>
+        </label>
+        <button type="button" onClick="rechne('hex');">=> Dec</button>
+        <br>
+        <label>Dec: 
+            <textarea id="dec" name="dec" rows="3" cols="50">15</textarea>
+        </label>
+        <button type="button" onClick="rechne('dec');">=> Hex</button>
     </form>
 
-    <form name="form64"> <!--Base64 nach Text vvs.-->
-        <h1>Base64 Convert</h1>
+<!-- Base64 nach Text vvs.-->
+<!-- <form name="form64">
+     <h1>Base64 Convert</h1>
         <label>Base64:<input id="base64" type="text" name="base64" size="90" value="VGV4dA=="></label>
         <button type="button" onClick="base('base64');">=> Text</button><br>
         <label>Text:__<input id="text" type="text" name="text" size="90" value="Text"></label>
         <button type="button" onClick="base('text');">=> Base64</button>
+    </form> -->
+
+    <!-- Base64 nach Text vvs.-->
+    <form name="form64">
+    <h1>Base64 Convert</h1>
+    <label>Base64:
+        <textarea id="base64" name="base64" rows="3" cols="90">VGV4dA==</textarea>
+    </label>
+    <button type="button" onClick="base('base64');">=> Text</button><br>
+    <label>Text:
+        <textarea id="text" name="text" rows="3" cols="90">Text</textarea>
+    </label>
+    <button type="button" onClick="base('text');">=> Base64</button>
     </form>
 
-    <form name="safeURL"> <!--Decode MS SafeLinks-->
+    <!-- Decode MS SafeLinks -->
+<!--<form name="safeURL"> 
         <h1>Decode SafeURL</h1>
         <label>SafeURL:<input id="safeURLlink" type="text" name="safeURLX" size="150" value=""></label>
         <button type="button" onClick="safe();">=> Decode</button><br>
         <label>URL dec.:<input id="URLdecoded" type="text" name="text" size="150" value=""></label>
+    </form> -->
+
+    <!--Decode MS SafeLinks-->
+    <form name="safeURL">
+    <h1>Decode SafeURL</h1>
+    <label>SafeURL:
+        <textarea id="safeURLlink" name="safeURLX" rows="3" cols="150"></textarea>
+    </label>
+    <button type="button" onClick="safe();">=> Decode</button><br>
+    <label>URL dec.:
+        <textarea id="URLdecoded" name="text" rows="3" cols="150"></textarea>
+    </label>
     </form>
 
     <form name="unicode"> <!--Text nach Unicode vvs.-->
@@ -243,13 +285,13 @@
             <tr>
                 <td>" </td>
                 <td> &amp;quot; </td>
-                <td> nur problematisch in Attributwerten mit "â¦"
+                <td> nur problematisch in Attributwerten mit "…"
                 </td>
             </tr>
             <tr>
                 <td>' </td>
                 <td> &amp;apos; </td>
-                <td> nur problematisch in Attributwerten mit 'â¦'
+                <td> nur problematisch in Attributwerten mit '…'
                 </td>
             </tr>
         </tbody>
