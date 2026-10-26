@@ -109,6 +109,26 @@
             document.getElementById(id).textContent = value;
         }
 
+        /*
+        * ============================================================
+        * Groß- / Kleinschreibung
+        * * ============================================================
+        * */
+
+        function textToUpperCase() {
+            const text = getValue("caseText");
+            const result = text.toUpperCase();
+
+            setValue("caseText", result);
+        }
+
+
+        function textToLowerCase() {
+            const text = getValue("caseText");
+            const result = text.toLowerCase();
+
+            setValue("caseText", result);
+        }
 
         /*
          * ============================================================
@@ -1591,6 +1611,28 @@
         keine kryptografische Signaturprüfung durch.
     </div>
 
+    <!-- ============================================================
+    URL Groß- /Kleinschreibung
+    ============================================================ -->
+    <section>
+
+        <h1>Groß- / Kleinschreibung</h1>
+
+        <label for="caseText">
+            Text:
+        </label>
+
+        <textarea id="caseText" rows="6">Hallo John, dies ist ein Beispiel.</textarea>
+
+        <button type="button" onclick="textToUpperCase()">
+            =&gt; GROSSBUCHSTABEN
+        </button>
+
+        <button type="button" onclick="textToLowerCase()">
+            =&gt; kleinbuchstaben
+        </button>
+
+    </section>
 
     <!-- ============================================================
          URL Encode / Decode
