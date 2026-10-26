@@ -1,32 +1,2235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geo Infos aus Browser</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self';
+                   style-src 'unsafe-inline';
+                   script-src 'unsafe-inline';
+                   img-src https:;
+                   child-src 'none';">
+
+    <title>Security Toolbox</title>
+
+    <style>
+        body {
+            background: rgb(240, 229, 168);
+            color: black;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        section {
+            margin-bottom: 35px;
+        }
+
+        h1 {
+            border-bottom: 2px solid black;
+            padding-bottom: 4px;
+        }
+
+        textarea,
+        input,
+        select {
+            background: #EEF;
+            box-sizing: border-box;
+            margin: 4px 0;
+        }
+
+        textarea {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"] {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        button {
+            margin: 4px;
+            padding: 5px 10px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .info {
+            background: #eef6ff;
+            border-left: 4px solid #3874b4;
+            padding: 8px;
+            margin: 8px 0;
+            max-width: 1180px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #d39e00;
+            padding: 8px;
+            margin: 8px 0;
+            max-width: 1180px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 6px;
+            text-align: left;
+        }
+    </style>
+
+    <script>
+
+        /*
+         * ============================================================
+         * Gemeinsame Hilfsfunktionen
+         * ============================================================
+         */
+
+        function getValue(id) {
+            return document.getElementById(id).value;
+        }
+
+        function setValue(id, value) {
+            document.getElementById(id).value = value;
+        }
+
+        function setText(id, value) {
+            document.getElementById(id).textContent = value;
+        }
+
+        /*
+        * ============================================================
+        * Groß- / Kleinschreibung
+        * * ============================================================
+        * */
+
+        function textToUpperCase() {
+            const text = getValue("caseText");
+            const result = text.toUpperCase();
+
+            setValue("caseText", result);
+        }
+
+
+        function textToLowerCase() {
+            const text = getValue("caseText");
+            const result = text.toLowerCase();
+
+            setValue("caseText", result);
+        }
+
+        /*
+         * ============================================================
+         * URL Encode / Decode
+         * ============================================================
+         */
+
+        function encodeUrl() {
+            const originalText = getValue("urlEncoder");
+
+            const encodedText = encodeURIComponent(originalText)
+                .replace(/'/g, "%27")
+                .replace(/"/g, "%22");
+
+            setValue("urlEncoder", encodedText);
+        }
+
+
+        function decodeUrl() {
+            const encodedText = getValue("urlEncoder");
+
+            try {
+                const decodedText = decodeURIComponent(
+                    encodedText.replace(/\+/g, " ")
+                );
+
+                setValue("urlEncoder", decodedText);
+
+            } catch (error) {
+                alert("Ungültige URL-Codierung.");
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * Hexadezimal / Dezimal
+         * ============================================================
+         */
+
+        function hexToDecimal() {
+            const hexValue = getValue("hex").trim();
+
+            if (hexValue === "") {
+                setValue("decimal", "");
+                return;
+            }
+
+            if (!/^[0-9a-fA-F]+$/.test(hexValue)) {
+                alert("Ungültiger Hexadezimalwert.");
+                return;
+            }
+
+            const decimalValue = parseInt(hexValue, 16);
+
+            setValue("decimal", decimalValue);
+        }
+
+
+        function decimalToHex() {
+            const input = getValue("decimal").trim();
+            const decimalValue = Number(input);
+
+            if (
+                input === "" ||
+                !Number.isSafeInteger(decimalValue) ||
+                decimalValue < 0
+            ) {
+                alert("Bitte eine nicht-negative ganze Dezimalzahl eingeben.");
+                return;
+            }
+
+            setValue(
+                "hex",
+                decimalValue.toString(16).toUpperCase()
+            );
+        }
+
+
+        /*
+         * ============================================================
+         * Base64 / Base64URL
+         * ============================================================
+         */
+
+        function bytesToBinaryString(bytes) {
+            let result = "";
+
+            for (const byte of bytes) {
+                result += String.fromCharCode(byte);
+            }
+
+            return result;
+        }
+
+
+        function binaryStringToBytes(binaryText) {
+            const bytes = new Uint8Array(binaryText.length);
+
+            for (let i = 0; i < binaryText.length; i++) {
+                bytes[i] = binaryText.charCodeAt(i);
+            }
+
+            return bytes;
+        }
+
+
+        function textToBase64() {
+            const text = getValue("base64Text");
+
+            const bytes = new TextEncoder().encode(text);
+            const binaryText = bytesToBinaryString(bytes);
+            const base64 = btoa(binaryText);
+
+            setValue("base64", base64);
+        }
+
+
+        function base64ToText() {
+            const base64 = getValue("base64").trim();
+
+            if (base64 === "") {
+                setValue("base64Text", "");
+                return;
+            }
+
+            try {
+                const binaryText = atob(base64);
+                const bytes = binaryStringToBytes(binaryText);
+
+                const text = new TextDecoder(
+                    "utf-8",
+                    { fatal: true }
+                ).decode(bytes);
+
+                setValue("base64Text", text);
+
+            } catch (error) {
+                alert("Ungültige Base64- oder UTF-8-Daten.");
+            }
+        }
+
+
+        function base64ToBase64Url() {
+            const base64 = getValue("base64").trim();
+
+            const base64Url = base64
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=+$/g, "");
+
+            setValue("base64Url", base64Url);
+        }
+
+
+        function base64UrlToBase64() {
+            let value = getValue("base64Url").trim();
+
+            value = value
+                .replace(/-/g, "+")
+                .replace(/_/g, "/");
+
+            while (value.length % 4 !== 0) {
+                value += "=";
+            }
+
+            setValue("base64", value);
+        }
+
+
+        /*
+         * ============================================================
+         * Microsoft SafeLink Decoder
+         * ============================================================
+         */
+
+        function decodeSafeLink() {
+            const input = getValue("safeLink").trim();
+
+            if (input === "") {
+                alert("Keine URL eingegeben.");
+                return;
+            }
+
+            try {
+                const safeLink = new URL(input);
+                const targetUrl = safeLink.searchParams.get("url");
+
+                if (!targetUrl) {
+                    alert("Parameter 'url' wurde nicht gefunden.");
+                    return;
+                }
+
+                setValue("safeLinkResult", targetUrl);
+
+            } catch (error) {
+                alert("Ungültige URL.");
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * URL Analyzer
+         * ============================================================
+         */
+
+        function analyzeUrl() {
+            const input = getValue("urlAnalyzer").trim();
+
+            try {
+                const url = new URL(input);
+
+                let output = "";
+
+                output += "Protocol: " + url.protocol + "\n";
+                output += "Hostname: " + url.hostname + "\n";
+                output += "Port: " + (url.port || "(Standard)") + "\n";
+                output += "Path: " + url.pathname + "\n";
+                output += "Fragment: " + (url.hash || "(keines)") + "\n";
+                output += "\nQuery Parameter:\n";
+
+                const parameters = Array.from(url.searchParams);
+
+                if (parameters.length === 0) {
+                    output += "(keine)\n";
+
+                } else {
+                    for (const [name, value] of parameters) {
+                        output += name + " = " + value + "\n";
+                    }
+                }
+
+                setValue("urlAnalysisResult", output);
+
+            } catch (error) {
+                alert("Ungültige URL.");
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * URL Security Check
+         * ============================================================
+         */
+
+        function checkUrlSecurity() {
+            const input = getValue("securityUrl").trim();
+
+            try {
+                const url = new URL(input);
+                const warnings = [];
+
+                if (url.protocol !== "https:") {
+                    warnings.push(
+                        "WARNUNG: Verbindung verwendet nicht HTTPS."
+                    );
+                }
+
+                if (url.username || url.password) {
+                    warnings.push(
+                        "WARNUNG: URL enthält Benutzername oder Passwort."
+                    );
+                }
+
+                if (url.port) {
+                    warnings.push(
+                        "HINWEIS: Expliziter Port: " + url.port
+                    );
+                }
+
+                if (
+                    /^\d{1,3}(\.\d{1,3}){3}$/.test(url.hostname) ||
+                    url.hostname.startsWith("[")
+                ) {
+                    warnings.push(
+                        "HINWEIS: Host wird als IP-Adresse angegeben."
+                    );
+                }
+
+                if (input.length > 2000) {
+                    warnings.push(
+                        "HINWEIS: URL ist ungewöhnlich lang."
+                    );
+                }
+
+                const sensitiveNames = [
+                    "password",
+                    "passwd",
+                    "pwd",
+                    "secret",
+                    "token",
+                    "access_token",
+                    "refresh_token",
+                    "id_token",
+                    "authorization",
+                    "apikey",
+                    "api_key"
+                ];
+
+                for (const name of url.searchParams.keys()) {
+                    if (
+                        sensitiveNames.includes(
+                            name.toLowerCase()
+                        )
+                    ) {
+                        warnings.push(
+                            "WARNUNG: Potenziell sensitiver Parameter: " +
+                            name
+                        );
+                    }
+                }
+
+                const redirectNames = [
+                    "redirect",
+                    "redirect_uri",
+                    "return",
+                    "returnurl",
+                    "return_url",
+                    "url",
+                    "target"
+                ];
+
+                for (const name of url.searchParams.keys()) {
+                    if (
+                        redirectNames.includes(
+                            name.toLowerCase()
+                        )
+                    ) {
+                        warnings.push(
+                            "HINWEIS: Redirect-/Zielparameter gefunden: " +
+                            name
+                        );
+                    }
+                }
+
+                if (warnings.length === 0) {
+                    setValue(
+                        "urlSecurityResult",
+                        "Keine einfachen Auffälligkeiten erkannt.\n\n" +
+                        "Dies ist keine Sicherheitsfreigabe der URL."
+                    );
+
+                } else {
+                    setValue(
+                        "urlSecurityResult",
+                        warnings.join("\n") +
+                        "\n\nDies sind Hinweise, keine bestätigten Schwachstellen."
+                    );
+                }
+
+            } catch (error) {
+                alert("Ungültige URL.");
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * Hash Generator
+         * ============================================================
+         */
+
+        function hashBufferToHex(hashBuffer) {
+            const hashBytes = new Uint8Array(hashBuffer);
+
+            return Array.from(hashBytes)
+                .map(
+                    byte =>
+                        byte
+                            .toString(16)
+                            .padStart(2, "0")
+                )
+                .join("")
+                .toUpperCase();
+        }
+
+
+        async function generateTextHash() {
+            const text = getValue("hashText");
+            const algorithm = getValue("hashAlgorithm");
+
+            const bytes = new TextEncoder().encode(text);
+
+            try {
+                const hashBuffer = await crypto.subtle.digest(
+                    algorithm,
+                    bytes
+                );
+
+                setValue(
+                    "hashResult",
+                    hashBufferToHex(hashBuffer)
+                );
+
+            } catch (error) {
+                alert("Hash konnte nicht berechnet werden.");
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * Datei Hash
+         * ============================================================
+         */
+
+        async function generateFileHash() {
+            const fileInput =
+                document.getElementById("hashFile");
+
+            const algorithm =
+                getValue("fileHashAlgorithm");
+
+            if (fileInput.files.length === 0) {
+                alert("Bitte zuerst eine Datei auswählen.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+
+            try {
+                const data = await file.arrayBuffer();
+
+                const hashBuffer = await crypto.subtle.digest(
+                    algorithm,
+                    data
+                );
+
+                setValue(
+                    "fileHashResult",
+                    hashBufferToHex(hashBuffer)
+                );
+
+            } catch (error) {
+                alert("Datei-Hash konnte nicht berechnet werden.");
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * Unix Timestamp Converter
+         * ============================================================
+         */
+
+        function timestampToDate() {
+            const input = getValue("timestampInput").trim();
+            const timestamp = Number(input);
+
+            if (
+                input === "" ||
+                !Number.isFinite(timestamp)
+            ) {
+                alert("Ungültiger Timestamp.");
+                return;
+            }
+
+            const date = new Date(timestamp * 1000);
+
+            if (Number.isNaN(date.getTime())) {
+                alert("Timestamp liegt außerhalb des gültigen Bereichs.");
+                return;
+            }
+
+            let output = "";
+
+            output +=
+                "UTC: " +
+                date.toISOString() +
+                "\n";
+
+            output +=
+                "Lokal: " +
+                date.toLocaleString();
+
+            setValue(
+                "timestampResult",
+                output
+            );
+        }
+
+
+        function dateToTimestamp() {
+            const input = getValue("dateInput");
+
+            if (!input) {
+                alert("Bitte Datum und Uhrzeit auswählen.");
+                return;
+            }
+
+            const date = new Date(input);
+
+            if (Number.isNaN(date.getTime())) {
+                alert("Ungültiges Datum.");
+                return;
+            }
+
+            const timestamp =
+                Math.floor(date.getTime() / 1000);
+
+            setValue(
+                "timestampResult",
+                timestamp
+            );
+        }
+
+
+        /*
+         * ============================================================
+         * JWT Decoder / Lifetime Analyzer
+         * ============================================================
+         */
+
+        function decodeBase64UrlJson(value) {
+            let base64 = value
+                .replace(/-/g, "+")
+                .replace(/_/g, "/");
+
+            while (base64.length % 4 !== 0) {
+                base64 += "=";
+            }
+
+            const binary = atob(base64);
+            const bytes = binaryStringToBytes(binary);
+
+            const json = new TextDecoder(
+                "utf-8",
+                { fatal: true }
+            ).decode(bytes);
+
+            return JSON.parse(json);
+        }
+
+
+        function formatJwtDate(value) {
+            if (typeof value !== "number") {
+                return "(nicht vorhanden)";
+            }
+
+            const date = new Date(value * 1000);
+
+            if (Number.isNaN(date.getTime())) {
+                return "(ungültig)";
+            }
+
+            return date.toISOString();
+        }
+
+
+        function decodeJwt() {
+            const jwt = getValue("jwtInput").trim();
+            const parts = jwt.split(".");
+
+            if (parts.length !== 3) {
+                alert(
+                    "Ein JWT muss aus drei durch Punkte getrennten Teilen bestehen."
+                );
+                return;
+            }
+
+            try {
+                const header =
+                    decodeBase64UrlJson(parts[0]);
+
+                const payload =
+                    decodeBase64UrlJson(parts[1]);
+
+                setValue(
+                    "jwtHeader",
+                    JSON.stringify(header, null, 4)
+                );
+
+                setValue(
+                    "jwtPayload",
+                    JSON.stringify(payload, null, 4)
+                );
+
+                let analysis = "";
+
+                analysis +=
+                    "Issuer (iss): " +
+                    (payload.iss ?? "(nicht vorhanden)") +
+                    "\n";
+
+                analysis +=
+                    "Subject (sub): " +
+                    (payload.sub ?? "(nicht vorhanden)") +
+                    "\n";
+
+                analysis +=
+                    "Audience (aud): " +
+                    JSON.stringify(
+                        payload.aud ?? "(nicht vorhanden)"
+                    ) +
+                    "\n";
+
+                analysis +=
+                    "Scope: " +
+                    JSON.stringify(
+                        payload.scope ?? "(nicht vorhanden)"
+                    ) +
+                    "\n";
+
+                analysis +=
+                    "Issued At (iat): " +
+                    formatJwtDate(payload.iat) +
+                    "\n";
+
+                analysis +=
+                    "Not Before (nbf): " +
+                    formatJwtDate(payload.nbf) +
+                    "\n";
+
+                analysis +=
+                    "Expires (exp): " +
+                    formatJwtDate(payload.exp) +
+                    "\n";
+
+                if (
+                    typeof payload.iat === "number" &&
+                    typeof payload.exp === "number"
+                ) {
+                    const lifetime =
+                        payload.exp - payload.iat;
+
+                    analysis +=
+                        "Lifetime: " +
+                        lifetime +
+                        " Sekunden (" +
+                        (lifetime / 60).toFixed(2) +
+                        " Minuten)\n";
+                }
+
+                const now =
+                    Math.floor(Date.now() / 1000);
+
+                if (
+                    typeof payload.nbf === "number" &&
+                    now < payload.nbf
+                ) {
+                    analysis +=
+                        "Status: Noch nicht gültig\n";
+
+                } else if (
+                    typeof payload.exp === "number" &&
+                    now >= payload.exp
+                ) {
+                    analysis +=
+                        "Status: Abgelaufen\n";
+
+                } else {
+                    analysis +=
+                        "Status: Zeitlich nicht abgelaufen\n";
+                }
+
+                analysis +=
+                    "\nWICHTIG: Die JWT-Signatur wurde NICHT geprüft.";
+
+                setValue(
+                    "jwtAnalysis",
+                    analysis
+                );
+
+            } catch (error) {
+                alert(
+                    "JWT konnte nicht decodiert werden."
+                );
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * JSON Formatter / Validator
+         * ============================================================
+         */
+
+        function formatJson() {
+            const input = getValue("jsonInput");
+
+            try {
+                const object = JSON.parse(input);
+
+                const formatted = JSON.stringify(
+                    object,
+                    null,
+                    4
+                );
+
+                setValue(
+                    "jsonInput",
+                    formatted
+                );
+
+                setText(
+                    "jsonStatus",
+                    "JSON ist gültig."
+                );
+
+            } catch (error) {
+                setText(
+                    "jsonStatus",
+                    "JSON ungültig: " +
+                    error.message
+                );
+            }
+        }
+
+
+        function jsonToBase64() {
+            const input = getValue("jsonInput");
+
+            try {
+                const object = JSON.parse(input);
+                const normalized = JSON.stringify(object);
+
+                const bytes =
+                    new TextEncoder().encode(normalized);
+
+                const binary =
+                    bytesToBinaryString(bytes);
+
+                setValue(
+                    "jsonBase64",
+                    btoa(binary)
+                );
+
+            } catch (error) {
+                alert("JSON ist ungültig.");
+            }
+        }
+
+
+        function base64ToJson() {
+            const base64 =
+                getValue("jsonBase64").trim();
+
+            try {
+                const binary = atob(base64);
+
+                const bytes =
+                    binaryStringToBytes(binary);
+
+                const jsonText =
+                    new TextDecoder(
+                        "utf-8",
+                        { fatal: true }
+                    ).decode(bytes);
+
+                const object = JSON.parse(jsonText);
+
+                setValue(
+                    "jsonInput",
+                    JSON.stringify(
+                        object,
+                        null,
+                        4
+                    )
+                );
+
+                setText(
+                    "jsonStatus",
+                    "Base64 enthält gültiges JSON."
+                );
+
+            } catch (error) {
+                alert(
+                    "Base64 enthält kein gültiges UTF-8-JSON."
+                );
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * HTML / XML Escape
+         * ============================================================
+         */
+
+        function escapeXml() {
+            const input = getValue("xmlInput");
+
+            const result = input
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&apos;");
+
+            setValue(
+                "xmlOutput",
+                result
+            );
+        }
+
+
+        function unescapeXml() {
+            const input = getValue("xmlInput");
+
+            const result = input
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
+                .replace(/&quot;/g, "\"")
+                .replace(/&apos;/g, "'")
+                .replace(/&amp;/g, "&");
+
+            setValue(
+                "xmlOutput",
+                result
+            );
+        }
+
+
+        /*
+         * ============================================================
+         * Unicode Zeichenreferenzen
+         * ============================================================
+         */
+
+        function textToUnicodeEntities() {
+            const input = getValue("unicodeText");
+
+            let result = "";
+
+            for (const character of input) {
+                result +=
+                    "&#" +
+                    character.codePointAt(0) +
+                    ";";
+            }
+
+            setValue(
+                "unicodeEntities",
+                result
+            );
+        }
+
+
+        function unicodeEntitiesToText() {
+            const input =
+                getValue("unicodeEntities");
+
+            try {
+                const result = input.replace(
+                    /&#(\d+);/g,
+                    function (match, number) {
+                        return String.fromCodePoint(
+                            Number(number)
+                        );
+                    }
+                );
+
+                setValue(
+                    "unicodeText",
+                    result
+                );
+
+            } catch (error) {
+                alert(
+                    "Ungültige Unicode-Zeichenreferenz."
+                );
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * XML Formatierung
+         *
+         * Wird sowohl vom SAML Viewer als auch vom
+         * XML/JSON Converter verwendet.
+         * ============================================================
+         */
+
+        function formatXml(xml) {
+
+            const indent = "    ";
+
+            /*
+             * XML zwischen Tags zunächst von vorhandenen
+             * Formatierungs-Leerzeichen befreien.
+             */
+            const compactXml = xml
+                .replace(/>\s+</g, "><")
+                .trim();
+
+            /*
+             * Zwischen zwei XML-Tags einen Zeilenumbruch einfügen.
+             *
+             * Wichtig:
+             * Text innerhalb eines Elements bleibt erhalten:
+             *
+             * <name>John</name>
+             *
+             * wird dadurch NICHT auseinandergerissen.
+             */
+            const xmlWithLineBreaks = compactXml
+                .replace(/(>)(<)(\/*)/g, "$1\n$2$3");
+
+            const lines = xmlWithLineBreaks.split("\n");
+
+            let indentationLevel = 0;
+            let result = "";
+
+            for (const line of lines) {
+
+                const trimmedLine = line.trim();
+
+                /*
+                 * Schließendes Element:
+                 *
+                 * </user>
+                 *
+                 * Eine Ebene zurückgehen.
+                 */
+                if (/^<\//.test(trimmedLine)) {
+                    indentationLevel--;
+                }
+
+                /*
+                 * Aktuelle Zeile schreiben.
+                 */
+                result +=
+                    indent.repeat(
+                        Math.max(indentationLevel, 0)
+                    ) +
+                    trimmedLine +
+                    "\n";
+
+                const isOpeningTag =
+                    /^<[^!?/][^>]*>$/.test(trimmedLine);
+
+                const isSelfClosing =
+                    /\/>$/.test(trimmedLine);
+
+                const containsClosingTag =
+                    /<\/[^>]+>$/.test(trimmedLine);
+
+                if (
+                    isOpeningTag &&
+                    !isSelfClosing &&
+                    !containsClosingTag
+                ) {
+                    indentationLevel++;
+                }
+            }
+
+            return result.trim();
+        }
+
+        /*
+         * ============================================================
+         * XML -> JSON
+         *
+         * Regeln:
+         *
+         * XML Attribute:
+         *   id="42"
+         *
+         * wird:
+         *   "@id": "42"
+         *
+         * Direkter XML Text wird:
+         *   "#text"
+         *
+         * Mehrfach vorkommende Elemente werden Arrays.
+         * ============================================================
+         */
+
+        function xmlToJson() {
+            const xmlText =
+                getValue("xmlJsonXmlInput").trim();
+
+            if (xmlText === "") {
+                alert("Bitte XML eingeben.");
+                return;
+            }
+
+            try {
+                const parser =
+                    new DOMParser();
+
+                const xmlDocument =
+                    parser.parseFromString(
+                        xmlText,
+                        "application/xml"
+                    );
+
+                const parserError =
+                    xmlDocument.querySelector(
+                        "parsererror"
+                    );
+
+                if (parserError) {
+                    throw new Error(
+                        "Das XML-Dokument ist nicht wohlgeformt."
+                    );
+                }
+
+                const rootElement =
+                    xmlDocument.documentElement;
+
+                const jsonObject = {
+                    [rootElement.nodeName]:
+                        xmlElementToObject(
+                            rootElement
+                        )
+                };
+
+                const formattedJson =
+                    JSON.stringify(
+                        jsonObject,
+                        null,
+                        4
+                    );
+
+                setValue(
+                    "xmlJsonJsonInput",
+                    formattedJson
+                );
+
+                setText(
+                    "xmlJsonStatus",
+                    "XML wurde erfolgreich in JSON umgewandelt."
+                );
+
+            } catch (error) {
+                setText(
+                    "xmlJsonStatus",
+                    "XML-Fehler: " +
+                    error.message
+                );
+            }
+        }
+
+
+        function xmlElementToObject(element) {
+            const result = {};
+
+            /*
+             * Attribute übernehmen
+             */
+            for (const attribute of element.attributes) {
+                const attributeName =
+                    "@" + attribute.name;
+
+                result[attributeName] =
+                    attribute.value;
+            }
+
+            /*
+             * Direkte Kindelemente
+             */
+            const childElements =
+                Array.from(element.children);
+
+            /*
+             * Direkten Text sammeln
+             */
+            let directText = "";
+
+            for (const childNode of element.childNodes) {
+
+                if (
+                    childNode.nodeType === Node.TEXT_NODE ||
+                    childNode.nodeType === Node.CDATA_SECTION_NODE
+                ) {
+                    directText +=
+                        childNode.nodeValue;
+                }
+            }
+
+            directText = directText.trim();
+
+            /*
+             * Einfaches XML-Element ohne Attribute/Kinder
+             */
+            if (
+                element.attributes.length === 0 &&
+                childElements.length === 0
+            ) {
+                return directText;
+            }
+
+            /*
+             * Element mit zusätzlichem Textinhalt
+             */
+            if (directText !== "") {
+                result["#text"] =
+                    directText;
+            }
+
+            /*
+             * Kindelemente rekursiv verarbeiten
+             */
+            for (const childElement of childElements) {
+
+                const childName =
+                    childElement.nodeName;
+
+                const childValue =
+                    xmlElementToObject(
+                        childElement
+                    );
+
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        result,
+                        childName
+                    )
+                ) {
+
+                    if (
+                        !Array.isArray(
+                            result[childName]
+                        )
+                    ) {
+                        result[childName] = [
+                            result[childName]
+                        ];
+                    }
+
+                    result[childName].push(
+                        childValue
+                    );
+
+                } else {
+                    result[childName] =
+                        childValue;
+                }
+            }
+
+            return result;
+        }
+
+
+        /*
+         * ============================================================
+         * JSON -> XML
+         * ============================================================
+         */
+
+        function jsonToXml() {
+            const jsonText =
+                getValue("xmlJsonJsonInput").trim();
+
+            if (jsonText === "") {
+                alert("Bitte JSON eingeben.");
+                return;
+            }
+
+            try {
+                const jsonObject =
+                    JSON.parse(jsonText);
+
+                if (
+                    typeof jsonObject !== "object" ||
+                    jsonObject === null ||
+                    Array.isArray(jsonObject)
+                ) {
+                    throw new Error(
+                        "Das JSON-Wurzelelement muss ein Objekt sein."
+                    );
+                }
+
+                const rootNames =
+                    Object.keys(jsonObject);
+
+                if (rootNames.length !== 1) {
+                    throw new Error(
+                        "Das JSON muss genau ein Wurzelelement enthalten."
+                    );
+                }
+
+                const rootName =
+                    rootNames[0];
+
+                if (!isValidXmlName(rootName)) {
+                    throw new Error(
+                        "Ungültiger XML-Elementname: " +
+                        rootName
+                    );
+                }
+
+                const xmlDocument =
+                    document.implementation.createDocument(
+                        null,
+                        rootName,
+                        null
+                    );
+
+                const rootElement =
+                    xmlDocument.documentElement;
+
+                appendJsonValueToXmlElement(
+                    xmlDocument,
+                    rootElement,
+                    jsonObject[rootName]
+                );
+
+                const serializer =
+                    new XMLSerializer();
+
+                const serializedXml =
+                    serializer.serializeToString(
+                        xmlDocument
+                    );
+
+                const formattedXml =
+                    formatXml(serializedXml);
+
+                const completeXml =
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    formattedXml;
+
+                setValue(
+                    "xmlJsonXmlInput",
+                    completeXml
+                );
+
+                setText(
+                    "xmlJsonStatus",
+                    "JSON wurde erfolgreich in XML umgewandelt."
+                );
+
+            } catch (error) {
+                setText(
+                    "xmlJsonStatus",
+                    "JSON-Fehler: " +
+                    error.message
+                );
+            }
+        }
+
+
+        function appendJsonValueToXmlElement(
+            xmlDocument,
+            xmlElement,
+            jsonValue
+        ) {
+
+            /*
+             * null => leeres Element
+             */
+            if (jsonValue === null) {
+                return;
+            }
+
+            /*
+             * Einfache Werte => Text
+             */
+            if (
+                typeof jsonValue === "string" ||
+                typeof jsonValue === "number" ||
+                typeof jsonValue === "boolean"
+            ) {
+                const textNode =
+                    xmlDocument.createTextNode(
+                        String(jsonValue)
+                    );
+
+                xmlElement.appendChild(
+                    textNode
+                );
+
+                return;
+            }
+
+            /*
+             * Array ohne Elementnamen ist nicht eindeutig
+             */
+            if (Array.isArray(jsonValue)) {
+                throw new Error(
+                    "Ein Array benötigt einen benannten XML-Knoten."
+                );
+            }
+
+            /*
+             * Attribute
+             */
+            for (
+                const [propertyName, propertyValue]
+                of Object.entries(jsonValue)
+            ) {
+
+                if (!propertyName.startsWith("@")) {
+                    continue;
+                }
+
+                const attributeName =
+                    propertyName.substring(1);
+
+                if (!isValidXmlName(attributeName)) {
+                    throw new Error(
+                        "Ungültiger XML-Attributname: " +
+                        attributeName
+                    );
+                }
+
+                xmlElement.setAttribute(
+                    attributeName,
+                    String(propertyValue)
+                );
+            }
+
+            /*
+             * Direkter Text
+             */
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    jsonValue,
+                    "#text"
+                )
+            ) {
+                const textNode =
+                    xmlDocument.createTextNode(
+                        String(
+                            jsonValue["#text"]
+                        )
+                    );
+
+                xmlElement.appendChild(
+                    textNode
+                );
+            }
+
+            /*
+             * Kindelemente
+             */
+            for (
+                const [propertyName, propertyValue]
+                of Object.entries(jsonValue)
+            ) {
+
+                if (
+                    propertyName.startsWith("@") ||
+                    propertyName === "#text"
+                ) {
+                    continue;
+                }
+
+                if (!isValidXmlName(propertyName)) {
+                    throw new Error(
+                        "Ungültiger XML-Elementname: " +
+                        propertyName
+                    );
+                }
+
+                /*
+                 * Array => Element mehrfach erzeugen
+                 */
+                if (Array.isArray(propertyValue)) {
+
+                    for (const arrayEntry of propertyValue) {
+
+                        const childElement =
+                            xmlDocument.createElement(
+                                propertyName
+                            );
+
+                        appendJsonValueToXmlElement(
+                            xmlDocument,
+                            childElement,
+                            arrayEntry
+                        );
+
+                        xmlElement.appendChild(
+                            childElement
+                        );
+                    }
+
+                } else {
+
+                    const childElement =
+                        xmlDocument.createElement(
+                            propertyName
+                        );
+
+                    appendJsonValueToXmlElement(
+                        xmlDocument,
+                        childElement,
+                        propertyValue
+                    );
+
+                    xmlElement.appendChild(
+                        childElement
+                    );
+                }
+            }
+        }
+
+
+        function isValidXmlName(name) {
+            return /^[A-Za-z_][A-Za-z0-9_.:-]*$/.test(name);
+        }
+
+
+        /*
+         * ============================================================
+         * SAML / Base64 XML Viewer
+         *
+         * Nur Decode und Darstellung.
+         * Keine Signaturprüfung.
+         * ============================================================
+         */
+
+        function decodeSaml() {
+            const input =
+                getValue("samlInput")
+                    .trim()
+                    .replace(/\s/g, "");
+
+            if (input === "") {
+                alert("Bitte Base64-codierte SAML/XML-Daten eingeben.");
+                return;
+            }
+
+            try {
+                const binary = atob(input);
+
+                const bytes =
+                    binaryStringToBytes(binary);
+
+                const xml =
+                    new TextDecoder(
+                        "utf-8",
+                        { fatal: true }
+                    ).decode(bytes);
+
+                const parser =
+                    new DOMParser();
+
+                const documentXml =
+                    parser.parseFromString(
+                        xml,
+                        "application/xml"
+                    );
+
+                if (
+                    documentXml.querySelector(
+                        "parsererror"
+                    )
+                ) {
+                    throw new Error(
+                        "Ungültiges XML"
+                    );
+                }
+
+                const serialized =
+                    new XMLSerializer()
+                        .serializeToString(
+                            documentXml
+                        );
+
+                setValue(
+                    "samlOutput",
+                    formatXml(serialized)
+                );
+
+            } catch (error) {
+                alert(
+                    "SAML/Base64 konnte nicht als XML decodiert werden."
+                );
+            }
+        }
+
+    </script>
 </head>
 
-<body>
-    <script>
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-            console.log("Geolocation is not supported by this browser.");
-        }
 
-        function showPosition(position) {
-            let lat = "N", lon = "E";
-            if ( position.coords.latitude < 0 ) {
-                lat = "S";
-            }
-            if ( position.coords.longitude < 0 ) {
-                lon = "W";
-            }
-            document.write(lat + position.coords.latitude +
-                ", " + lon + position.coords.longitude);
-        }
-    </script>
+<body>
+
+    <h1>Security Toolbox</h1>
+
+    <div class="info">
+        Die Funktionen dieser Seite arbeiten lokal im Browser.
+        JWT- und SAML-Funktionen decodieren Daten, führen jedoch
+        keine kryptografische Signaturprüfung durch.
+    </div>
+
+    <!-- ============================================================
+    URL Groß- /Kleinschreibung
+    ============================================================ -->
+    <section>
+
+        <h1>Groß- / Kleinschreibung</h1>
+
+        <label for="caseText">
+            Text:
+        </label>
+
+        <textarea id="caseText" rows="6">Hallo John, dies ist ein Beispiel.</textarea>
+
+        <button type="button" onclick="textToUpperCase()">
+            =&gt; GROSSBUCHSTABEN
+        </button>
+
+        <button type="button" onclick="textToLowerCase()">
+            =&gt; kleinbuchstaben
+        </button>
+
+    </section>
+
+    <!-- ============================================================
+         URL Encode / Decode
+         ============================================================ -->
+
+    <section>
+
+        <h1>URL Encode / Decode</h1>
+
+        <textarea id="urlEncoder" rows="5"></textarea>
+
+        <br>
+
+        <button type="button" onclick="encodeUrl()">
+            Encode
+        </button>
+
+        <button type="button" onclick="decodeUrl()">
+            Decode
+        </button>
+
+    </section>
+
+
+    <!-- ============================================================
+         Hex / Dezimal
+         ============================================================ -->
+
+    <section>
+
+        <h1>Hex / Dezimal</h1>
+
+        <label for="hex">
+            Hex:
+        </label>
+
+        <input id="hex" type="text" value="F">
+
+        <button type="button" onclick="hexToDecimal()">
+            =&gt; Dezimal
+        </button>
+
+
+        <label for="decimal">
+            Dezimal:
+        </label>
+
+        <input id="decimal" type="text" value="15">
+
+        <button type="button" onclick="decimalToHex()">
+            =&gt; Hex
+        </button>
+
+    </section>
+
+
+    <!-- ============================================================
+         Base64
+         ============================================================ -->
+
+    <section>
+
+        <h1>Base64 / Base64URL</h1>
+
+        <label for="base64">
+            Base64:
+        </label>
+
+        <textarea id="base64" rows="4">VGV4dA==</textarea>
+
+        <button type="button" onclick="base64ToText()">
+            Base64 =&gt; Text
+        </button>
+
+        <button type="button" onclick="base64ToBase64Url()">
+            Base64 =&gt; Base64URL
+        </button>
+
+
+        <label for="base64Text">
+            Text:
+        </label>
+
+        <textarea id="base64Text" rows="4">Text</textarea>
+
+        <button type="button" onclick="textToBase64()">
+            Text =&gt; Base64
+        </button>
+
+
+        <label for="base64Url">
+            Base64URL:
+        </label>
+
+        <textarea id="base64Url" rows="4"></textarea>
+
+        <button type="button" onclick="base64UrlToBase64()">
+            Base64URL =&gt; Base64
+        </button>
+
+    </section>
+
+
+    <!-- ============================================================
+         SafeLink
+         ============================================================ -->
+
+    <section>
+
+        <h1>Microsoft SafeLink Decoder</h1>
+
+        <label for="safeLink">
+            SafeLink:
+        </label>
+
+        <textarea id="safeLink" rows="5"></textarea>
+
+        <button type="button" onclick="decodeSafeLink()">
+            Decode
+        </button>
+
+
+        <label for="safeLinkResult">
+            Ziel-URL:
+        </label>
+
+        <textarea id="safeLinkResult" rows="5"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         URL Analyzer
+         ============================================================ -->
+
+    <section>
+
+        <h1>URL Analyzer</h1>
+
+        <label for="urlAnalyzer">
+            URL:
+        </label>
+
+        <textarea id="urlAnalyzer" rows="4"></textarea>
+
+        <button type="button" onclick="analyzeUrl()">
+            Analysieren
+        </button>
+
+
+        <label for="urlAnalysisResult">
+            Analyse:
+        </label>
+
+        <textarea id="urlAnalysisResult" rows="12"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         URL Security Check
+         ============================================================ -->
+
+    <section>
+
+        <h1>URL Security Check</h1>
+
+        <div class="warning">
+            Die Funktion erkennt einfache Auffälligkeiten.
+            Das Ergebnis ist keine Aussage darüber, ob eine URL
+            tatsächlich sicher oder bösartig ist.
+        </div>
+
+        <label for="securityUrl">
+            URL:
+        </label>
+
+        <textarea id="securityUrl" rows="4"></textarea>
+
+        <button type="button" onclick="checkUrlSecurity()">
+            Prüfen
+        </button>
+
+
+        <label for="urlSecurityResult">
+            Ergebnis:
+        </label>
+
+        <textarea id="urlSecurityResult" rows="10"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         Hash Generator
+         ============================================================ -->
+
+    <section>
+
+        <h1>Hash Generator</h1>
+
+        <label for="hashText">
+            Text:
+        </label>
+
+        <textarea id="hashText" rows="5"></textarea>
+
+
+        <label for="hashAlgorithm">
+            Algorithmus:
+        </label>
+
+        <select id="hashAlgorithm">
+            <option value="SHA-256">SHA-256</option>
+            <option value="SHA-384">SHA-384</option>
+            <option value="SHA-512">SHA-512</option>
+        </select>
+
+        <button type="button" onclick="generateTextHash()">
+            Hash berechnen
+        </button>
+
+
+        <label for="hashResult">
+            Hash:
+        </label>
+
+        <textarea id="hashResult" rows="4"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         Datei Hash
+         ============================================================ -->
+
+    <section>
+
+        <h1>Datei Hash</h1>
+
+        <input type="file" id="hashFile">
+
+        <select id="fileHashAlgorithm">
+            <option value="SHA-256">SHA-256</option>
+            <option value="SHA-384">SHA-384</option>
+            <option value="SHA-512">SHA-512</option>
+        </select>
+
+        <button type="button" onclick="generateFileHash()">
+            Datei-Hash berechnen
+        </button>
+
+
+        <label for="fileHashResult">
+            Hash:
+        </label>
+
+        <textarea id="fileHashResult" rows="4"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         Timestamp
+         ============================================================ -->
+
+    <section>
+
+        <h1>Unix Timestamp</h1>
+
+        <label for="timestampInput">
+            Unix Timestamp:
+        </label>
+
+        <input id="timestampInput" type="text">
+
+        <button type="button" onclick="timestampToDate()">
+            =&gt; Datum
+        </button>
+
+
+        <label for="dateInput">
+            Datum / Uhrzeit:
+        </label>
+
+        <input id="dateInput" type="datetime-local">
+
+        <button type="button" onclick="dateToTimestamp()">
+            =&gt; Timestamp
+        </button>
+
+
+        <label for="timestampResult">
+            Ergebnis:
+        </label>
+
+        <textarea id="timestampResult" rows="4"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         JWT
+         ============================================================ -->
+
+    <section>
+
+        <h1>JWT Decoder / Analyzer</h1>
+
+        <div class="warning">
+            Die JWT-Signatur wird nicht validiert.
+            Die Anzeige der Claims bedeutet nicht,
+            dass das Token vertrauenswürdig ist.
+        </div>
+
+        <label for="jwtInput">
+            JWT:
+        </label>
+
+        <textarea id="jwtInput" rows="6"></textarea>
+
+        <button type="button" onclick="decodeJwt()">
+            JWT analysieren
+        </button>
+
+
+        <label for="jwtHeader">
+            Header:
+        </label>
+
+        <textarea id="jwtHeader" rows="8"></textarea>
+
+
+        <label for="jwtPayload">
+            Payload:
+        </label>
+
+        <textarea id="jwtPayload" rows="14"></textarea>
+
+
+        <label for="jwtAnalysis">
+            Analyse:
+        </label>
+
+        <textarea id="jwtAnalysis" rows="12"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         JSON Formatter
+         ============================================================ -->
+
+    <section>
+
+        <h1>JSON Formatter / Validator</h1>
+
+        <label for="jsonInput">
+            JSON:
+        </label>
+
+        <textarea id="jsonInput" rows="14"></textarea>
+
+        <button type="button" onclick="formatJson()">
+            Formatieren / Prüfen
+        </button>
+
+        <button type="button" onclick="jsonToBase64()">
+            JSON =&gt; Base64
+        </button>
+
+        <div id="jsonStatus" class="info">
+            Noch keine Prüfung durchgeführt.
+        </div>
+
+
+        <label for="jsonBase64">
+            JSON Base64:
+        </label>
+
+        <textarea id="jsonBase64" rows="6"></textarea>
+
+        <button type="button" onclick="base64ToJson()">
+            Base64 =&gt; JSON
+        </button>
+
+    </section>
+
+
+    <!-- ============================================================
+         HTML / XML Escape
+         ============================================================ -->
+
+    <section>
+
+        <h1>HTML / XML Escape</h1>
+
+        <label for="xmlInput">
+            Eingabe:
+        </label>
+
+        <textarea id="xmlInput" rows="8">
+            &lt;user id="42"&gt;
+            &lt;name&gt;John&lt;/name&gt;
+            &lt;role&gt;Security&lt;/role&gt;
+            &lt;role&gt;SAP&lt;/role&gt;
+            &lt;/user&gt;
+        </textarea>
+
+        <button type="button" onclick="escapeXml()">
+            Escape
+        </button>
+
+        <button type="button" onclick="unescapeXml()">
+            Unescape
+        </button>
+
+
+        <label for="xmlOutput">
+            Ergebnis:
+        </label>
+
+        <textarea id="xmlOutput" rows="8"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         Unicode
+         ============================================================ -->
+
+    <section>
+
+        <h1>Unicode Zeichenreferenzen</h1>
+
+        <label for="unicodeText">
+            Text:
+        </label>
+
+        <textarea id="unicodeText" rows="4">Hallo</textarea>
+
+        <button type="button" onclick="textToUnicodeEntities()">
+            =&gt; Unicode
+        </button>
+
+
+        <label for="unicodeEntities">
+            Zeichenreferenzen:
+        </label>
+
+        <textarea id="unicodeEntities" rows="4"></textarea>
+
+        <button type="button" onclick="unicodeEntitiesToText()">
+            =&gt; Text
+        </button>
+
+    </section>
+
+
+    <!-- ============================================================
+         XML / JSON Converter
+         ============================================================ -->
+
+    <section>
+
+        <h1>XML / JSON Converter</h1>
+
+        <div class="warning">
+            XML und JSON besitzen unterschiedliche Datenmodelle.
+            XML-Attribute werden im JSON mit @ gekennzeichnet.
+            Direkter Text wird bei komplexen Elementen unter
+            #text gespeichert. Mehrfach vorkommende Elemente
+            werden als JSON-Array dargestellt.
+        </div>
+
+
+        <label for="xmlJsonXmlInput">
+            XML:
+        </label>
+
+        <textarea id="xmlJsonXmlInput" rows="18"><user id="42">
+    <name>John</name>
+    <role>Security</role>
+    <role>SAP</role>
+</user></textarea>
+
+
+        <button type="button" onclick="xmlToJson()">
+            XML =&gt; JSON
+        </button>
+
+        <button type="button" onclick="jsonToXml()">
+            JSON =&gt; XML
+        </button>
+
+
+        <label for="xmlJsonJsonInput">
+            JSON:
+        </label>
+
+        <textarea id="xmlJsonJsonInput" rows="18"></textarea>
+
+
+        <div id="xmlJsonStatus" class="info">
+            Noch keine Konvertierung durchgeführt.
+        </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         SAML Viewer
+         ============================================================ -->
+
+    <section>
+
+        <h1>SAML / Base64 XML Viewer</h1>
+
+        <div class="warning">
+            Diese Funktion decodiert Base64 und stellt enthaltenes XML dar.
+            Eine XML- oder SAML-Signatur wird nicht validiert.
+        </div>
+
+        <label for="samlInput">
+            Base64-codierte SAML/XML-Daten:
+        </label>
+
+        <textarea id="samlInput" rows="8"></textarea>
+
+        <button type="button" onclick="decodeSaml()">
+            SAML / XML decodieren
+        </button>
+
+
+        <label for="samlOutput">
+            XML:
+        </label>
+
+        <textarea id="samlOutput" rows="20"></textarea>
+
+    </section>
+
+
+    <!-- ============================================================
+         XML Referenztabelle
+         ============================================================ -->
+
+    <section>
+
+        <h1>XML Notation</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Zeichen</th>
+                    <th>XML</th>
+                    <th>Bemerkung</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>&lt;</td>
+                    <td>&amp;lt;</td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>&gt;</td>
+                    <td>&amp;gt;</td>
+                    <td>Relevant in XML-Markup</td>
+                </tr>
+
+                <tr>
+                    <td>&amp;</td>
+                    <td>&amp;amp;</td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>"</td>
+                    <td>&amp;quot;</td>
+                    <td>Relevant in Attributwerten</td>
+                </tr>
+
+                <tr>
+                    <td>'</td>
+                    <td>&amp;apos;</td>
+                    <td>Relevant in Attributwerten</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </section>
+
 </body>
 
 </html>
